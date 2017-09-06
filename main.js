@@ -27,7 +27,7 @@ function generateKeyPair() {
     keygen.on('exit', () => {
       resolve('rsa_private');
     });
-  }).then(()=>getStoreKeyPairs())
+  }).then(()=>getStoreKeyPair())
 }
 
 function getKeyPair() {
