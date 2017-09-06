@@ -8,5 +8,5 @@ test/coverage
 temp.*
 docs
 device.json
-private.key
-public.pem
+*.key
+*.pem

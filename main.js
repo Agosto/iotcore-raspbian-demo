@@ -1,7 +1,7 @@
 const eddystoneBeacon = require('eddystone-beacon');
 
 const fs = require('fs');
-const keypair = require('keypair');
+//const keypair = require('keypair');
 const Promise = require('promise');
 const crypto = require("crypto");
 const os = require('os');
@@ -9,8 +9,8 @@ const os = require('os');
 const readFile = Promise.denodeify(fs.readFile);
 const writeFile = Promise.denodeify(fs.writeFile);
 
-const privateKeyFile = __dirname + '/private.key';
-const publicKeyFile = __dirname + '/public.pem';
+const privateKeyFile = __dirname + '/rsa_private.pem';
+const publicKeyFile = __dirname + '/rsa_cert.pem';
 const deviceSettingsFile = __dirname + '/device.json';
 
 function advertiseBeacon() {
@@ -18,7 +18,24 @@ function advertiseBeacon() {
   eddystoneBeacon.advertiseUrl(url);
 }
 
-function getStoreKeyPairs() {
+const spawn = require('child_process').spawn;
+
+function generateKeyPair() {
+  return new Promise((resolve,reject)=>{
+    const args =  [ 'req', '-x509', '-newkey', 'rsa:2048', '-keyout', privateKeyFile,'-nodes', '-out', publicKeyFile, '-subj',   '/CN=unused'];
+    const keygen = spawn('openssl', args);
+    keygen.on('exit', () => {
+      resolve('rsa_private');
+    });
+  }).then(()=>getStoreKeyPairs())
+}
+
+function getKeyPair() {
+  return getStoreKeyPair()
+    .catch(err=>generateKeyPair())
+}
+
+function getStoreKeyPair() {
   console.log('Loading stored key pair');
   const pair  = {public:null,private:null};
   return readFile(publicKeyFile,'utf8')
@@ -29,14 +46,10 @@ function getStoreKeyPairs() {
     .then(text=>{
       pair.private = text;
       return Promise.resolve(pair);
-    })
-    .catch(err=>{
-      console.log(err);
-      return generateKeyPairs();
-    })
+    });
 }
 
-function generateKeyPairs() {
+/*function generateKeyPairs() {
   console.log('Generating key pair');
   const pair = keypair({
     bits: 2048, // size for the private key in bits. Default: 2048
@@ -45,7 +58,7 @@ function generateKeyPairs() {
   return writeFile(privateKeyFile,pair.private)
     .then(()=>writeFile(publicKeyFile,pair.public))
     .then(()=>Promise.resolve(pair));
-}
+}*/
 
 function loadDeviceSettings(pair) {
   return readFile(deviceSettingsFile,'utf8')
@@ -56,7 +69,7 @@ function loadDeviceSettings(pair) {
     })
     .catch(err=>{
       console.warn(err);
-      return generateDeviceSettings();
+      return generateDeviceSettings(pair);
     })
 }
 
@@ -88,6 +101,16 @@ function webServer(settings) {
   const port = 8080;
   const server = http.createServer((req, res) => {
     console.log(`requesting ${req.method} ${req.url}`);
+    if(req.method==="POST") {
+      var body = '';
+      req.on('data', function(chunk) {
+        body += chunk;
+      });
+      req.on('end', function() {
+        console.log(body);
+      });
+      //console.log(req.body);
+    }
     res.writeHead(200, {"Content-Type": "application/json"});
     res.end(JSON.stringify(settings));
   });
@@ -97,7 +120,7 @@ function webServer(settings) {
 }
 
 function main() {
-  getStoreKeyPairs()
+  getKeyPair()
     .then(pair=>loadDeviceSettings(pair))
     .then(settings=>{
       console.log(settings);
@@ -108,3 +131,5 @@ function main() {
 
 main();
 
+
+// openssl req -x509 -newkey rsa:2048 -keyout rsa_private.pem -nodes -out rsa_cert.pem -subj "/CN=unused"
