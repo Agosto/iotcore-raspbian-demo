@@ -1,0 +1,9 @@
+node_modules
+/dist
+temp
+.tmp
+.idea
+test/log.txt
+test/coverage
+temp.*
+docs
