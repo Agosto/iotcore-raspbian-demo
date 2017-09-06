@@ -7,3 +7,6 @@ test/log.txt
 test/coverage
 temp.*
 docs
+device.json
+private.key
+public.pem
