@@ -13,6 +13,8 @@ const privateKeyFile = __dirname + '/rsa_private.pem';
 const publicKeyFile = __dirname + '/rsa_cert.pem';
 const deviceSettingsFile = __dirname + '/device.json';
 
+const iotcore = require('./iotcore');
+
 function advertiseBeacon() {
   const url = "http://"+getWifiIPAddress();
   eddystoneBeacon.advertiseUrl(url);
@@ -49,17 +51,6 @@ function getStoreKeyPair() {
     });
 }
 
-/*function generateKeyPairs() {
-  console.log('Generating key pair');
-  const pair = keypair({
-    bits: 2048, // size for the private key in bits. Default: 2048
-    e: 65537 // public exponent to use. Default: 65537
-  });
-  return writeFile(privateKeyFile,pair.private)
-    .then(()=>writeFile(publicKeyFile,pair.public))
-    .then(()=>Promise.resolve(pair));
-}*/
-
 function loadDeviceSettings(pair) {
   return readFile(deviceSettingsFile,'utf8')
     .then(text=>{
@@ -74,7 +65,7 @@ function loadDeviceSettings(pair) {
 }
 
 function generateDeviceSettings(pair) {
-  const data = {deviceId:crypto.randomBytes(4).toString('hex'),projectId:'',registryId:''};
+  const data = {deviceId:'device-'+crypto.randomBytes(4).toString('hex'),projectId:'',registryId:''};
   return writeFile(deviceSettingsFile,JSON.stringify(data))
     .then(() => {
     data.encodedPublicKey = pair.public;
@@ -86,7 +77,7 @@ function getWifiIPAddress() {
   const interfaces = os.networkInterfaces();
   if(interfaces.wlan0) {
     for (let a of interfaces.wlan0) {
-      if (a.family == 'IPv4') {
+      if (a.family === 'IPv4') {
         return a.address;
       }
     }
@@ -102,17 +93,26 @@ function webServer(settings) {
   const server = http.createServer((req, res) => {
     console.log(`requesting ${req.method} ${req.url}`);
     if(req.method==="POST") {
-      var body = '';
+      let body = '';
       req.on('data', function(chunk) {
         body += chunk;
       });
       req.on('end', function() {
         console.log(body);
+        const bodyJson = JSON.parse(body);
+        settings.projectId = bodyJson.projectId;
+        settings.registryId = bodyJson.registryId;
+        writeFile(deviceSettingsFile,JSON.stringify(settings))
+          .then(()=>{
+            res.writeHead(200, {"Content-Type": "application/json"});
+            res.end(JSON.stringify(settings));
+          });
       });
       //console.log(req.body);
+    } else {
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(JSON.stringify(settings));
     }
-    res.writeHead(200, {"Content-Type": "application/json"});
-    res.end(JSON.stringify(settings));
   });
   server.listen(port, hostname, () => {
     console.log(`WebServer running at http://${hostname}:${port}/`);
@@ -126,10 +126,19 @@ function main() {
       console.log(settings);
       advertiseBeacon();
       webServer(settings);
+      iotcore.connect(settings).then(client=>{
+        const topic = iotcore.telemetryTopic(settings.deviceId);
+        setInterval(()=>client.publish(topic,`${settings.deviceId} ${new Date().toISOString()}`),(1000*60));
+        client.subscribe(`/devices/${settings.deviceId}/config`);
+        client.on('message', function (topic, message) {
+          // message is Buffer
+          console.log(message.toString())
+          //client.end()
+        })
+      });
     });
 }
 
 main();
-
 
 // openssl req -x509 -newkey rsa:2048 -keyout rsa_private.pem -nodes -out rsa_cert.pem -subj "/CN=unused"
