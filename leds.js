@@ -11,12 +11,13 @@ try {
 
 function ledOn(r,g,b,time) {
   if(blinkt) {
-    blinkt.setAll(r, g, b, 0.25);
+    blinkt.setAll(r, g, b, 0.2);
     try {
       blinkt.show();
       if (time) {
         setTimeout(() => {
           blinkt.clear();
+          blinkt.show();
         }, time)
       }
     } catch (e) {
