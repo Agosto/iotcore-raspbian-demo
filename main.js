@@ -18,7 +18,7 @@ function main() {
         setInterval(()=>{
           client.publish(topic,`${settings.deviceId} ${new Date().toISOString()}`);
           leds.ledOn(0,255,0,5000);
-        },(1000*6));
+        },(1000*30));
       });
     });
 }
