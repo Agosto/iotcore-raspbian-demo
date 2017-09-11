@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "main": "main.js",
   "dependencies": {
-    "blinkt": "0.0.1",
+    "blinkt": "git+https://github.com/NotNinja/node-blinkt.git",
     "eddystone-beacon": "^1.0.7",
     "jsonwebtoken": "^7.4.1",
     "mqtt": "^2.7.2",
