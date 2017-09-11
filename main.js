@@ -141,4 +141,17 @@ function main() {
 
 main();
 
+
+function setBlinkt() {
+  try {
+    const blinkt = require('blinkt');
+    blinkt.setPixels(0, 0, 255, 0.5);
+    blinkt.show();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+setBlinkt();
+
 // openssl req -x509 -newkey rsa:2048 -keyout rsa_private.pem -nodes -out rsa_cert.pem -subj "/CN=unused"
