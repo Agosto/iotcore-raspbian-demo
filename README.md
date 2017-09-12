@@ -79,6 +79,8 @@ This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE
 
 #### Configure App to Run on boot (via cron)
 
+This is a very simple way to start the app on boot via cron.  You can also use [RC.LOCAL](https://www.raspberrypi.org/documentation/linux/usage/rc-local.md).  
+
 - Add this to user `pi` cron jobs
 ```bash
 $ chmod +x startup.sh
