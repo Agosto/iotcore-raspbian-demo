@@ -42,7 +42,7 @@ function getKeyPair() {
 }
 
 function getStoreKeyPair() {
-  console.log('Loading stored key pair');
+  console.log(`Loading stored key pair at ${publicKeyFile}`);
   const pair  = {public:null,private:null};
   return readFile(publicKeyFile,'utf8')
     .then(text=>{
