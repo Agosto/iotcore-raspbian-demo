@@ -26,6 +26,7 @@ function advertiseBeacon() {
 }
 
 function generateKeyPair() {
+  console.log('Generating new key pair');
   return new Promise((resolve,reject)=>{
     const args =  [ 'req', '-x509', '-newkey', 'rsa:2048', '-keyout', privateKeyFile,'-nodes', '-out', publicKeyFile, '-subj',   '/CN=unused'];
     const keygen = spawn('openssl', args);
@@ -55,6 +56,7 @@ function getStoreKeyPair() {
 }
 
 function loadDeviceSettings(pair) {
+  console.log('Loading device settings');
   return readFile(deviceSettingsFile,'utf8')
     .then(text=>{
       const json = JSON.parse(text);
