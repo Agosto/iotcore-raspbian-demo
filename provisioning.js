@@ -18,6 +18,8 @@ const http = require('http');
 
 const spawn = require('child_process').spawn;
 
+const leds = require('./leds');
+
 function advertiseBeacon() {
   const url = "http://"+getWifiIPAddress();
   eddystoneBeacon.advertiseUrl(url);
@@ -131,6 +133,7 @@ function provision() {
     .then(pair=>loadDeviceSettings(pair))
     .then(settings=>{
       advertiseBeacon();
+      leds.ledOn(0,0,255,5000);
       return webServer(settings);
     });
 }

@@ -1,9 +1,10 @@
 
 const iotcore = require('./iotcore');
 const provisioning = require('./provisioning');
-const leds = require('./leds')
+const leds = require('./leds');
 
 function main() {
+  leds.ledOn(255,0,0);
   provisioning.provision()
     .then(settings=>{
       console.log(settings);
@@ -11,14 +12,15 @@ function main() {
         client.subscribe(`/devices/${settings.deviceId}/config`);
         client.on('message', function (topic, message) {
           // message is Buffer
-          console.log(message.toString())
+          console.log(message.toString());
+          leds.ledOn(0,255,0,5000);
           //client.end()
         });
         const topic = iotcore.telemetryTopic(settings.deviceId);
         setInterval(()=>{
           client.publish(topic,`${settings.deviceId} ${new Date().toISOString()}`);
           leds.ledOn(0,255,0,5000);
-        },(1000*30));
+        },(1000*60));
       });
     });
 }

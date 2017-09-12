@@ -10,20 +10,17 @@ try {
 }
 
 function ledOn(r,g,b,time) {
-  if(blinkt) {
+  try {
     blinkt.setAll(r, g, b, 0.2);
-    try {
-      blinkt.show();
-      if (time) {
-        setTimeout(() => {
-          blinkt.clear();
-          blinkt.show();
-        }, time)
-      }
-    } catch (e) {
-      console.warn(2);
-      console.warn('No blinkt');
+    blinkt.show();
+    if (time) {
+      setTimeout(() => {
+        blinkt.clear();
+        blinkt.show();
+      }, time)
     }
+  } catch (e) {
+    console.warn('No led found');
   }
 }
 
