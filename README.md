@@ -1,9 +1,9 @@
-#IOT Core Demo Node.js App
+# IOT Core Demo Node.js App
 A Node.js app targeting Raspberry Pi 3 running Raspbian that demonstrating how to provision an device into [Google Cloud IoT Core](https://cloud.google.com/iot-core/).  
 
 This project is the device half of the Cloud IoT Core demo. The provisioning mobile app can be found here [TODO: LINK TO ANDROID APP](TODO) 
 
-##What You Need
+## What You Need
 
 - Raspberry Pi 3 Model B (other models might work but have not been tested)
 - MicroSD card of 16 GB or higher
@@ -12,9 +12,9 @@ This project is the device half of the Cloud IoT Core demo. The provisioning mob
 - USB Mouse and keyboard (setup only)
 - (optional) [Blinkt!](https://shop.pimoroni.com/products/blinkt) RGB LED Strip
 
-##Device Setup
+## Device Setup
 
-###1) Flash Raspbian to Raspberry Pi 3.
+### 1) Flash Raspbian to Raspberry Pi 3.
 Official instructions can be found [HERE](https://www.raspberrypi.org/documentation/installation/installing-images/README.md): 
 
 Quick Setup
@@ -31,7 +31,7 @@ $ sudo apt full-upgrade
 ```
 - (optional) Using Raspberry Pi Configuration App, set the device to run an SSH server on startup. Once this is done, you can disconnect the mouse, keyboard and display if you like.  
 
-###2) Add software for app
+### 2) Add software for app
 
 #### Install Node.js
 ```bash
