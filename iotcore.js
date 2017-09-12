@@ -23,6 +23,7 @@ function telemetryTopic(deviceId) {
   return `/devices/${deviceId}/events`;
 }
 
+
 function connect(settings) {
 
   const cloudRegion = "us-central1";

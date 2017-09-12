@@ -13,7 +13,7 @@ function main() {
         client.on('message', function (topic, message) {
           // message is Buffer
           console.log(message.toString());
-          leds.ledOn(0,255,0,5000);
+          leds.ledOn(255,255,0,5000);
           //client.end()
         });
         const topic = iotcore.telemetryTopic(settings.deviceId);
