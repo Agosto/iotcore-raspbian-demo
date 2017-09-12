@@ -81,6 +81,7 @@ This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE
 
 - Add this to user `pi` cron jobs
 ```bash
+$ chmod +x startup.sh
 $ crontab -e
 ```
 - Add the following job and save

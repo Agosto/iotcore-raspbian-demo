@@ -22,6 +22,10 @@ function main() {
           leds.ledOn(0,255,0,5000);
         },(1000*60));
       });
+    })
+    .catch(error=>{
+      leds.ledOn(255,0,0);
+      console.warn(error);
     });
 }
 
