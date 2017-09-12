@@ -21,6 +21,7 @@ const spawn = require('child_process').spawn;
 const leds = require('./leds');
 
 function advertiseBeacon() {
+  console.log('advertising beacon');
   const url = "http://"+getWifiIPAddress();
   eddystoneBeacon.advertiseUrl(url);
 }
@@ -56,7 +57,7 @@ function getStoreKeyPair() {
 }
 
 function loadDeviceSettings(pair) {
-  console.log('Loading device settings');
+  console.log(`Loading device settings at ${deviceSettingsFile}`);
   return readFile(deviceSettingsFile,'utf8')
     .then(text=>{
       const json = JSON.parse(text);
@@ -70,6 +71,7 @@ function loadDeviceSettings(pair) {
 }
 
 function generateDeviceSettings(pair) {
+  console.log('Generating new device Id');
   const data = {deviceId:'device-'+crypto.randomBytes(4).toString('hex'),projectId:'',registryId:''};
   return writeFile(deviceSettingsFile,JSON.stringify(data))
     .then(() => {
