@@ -1,4 +1,4 @@
-# IOT Core Demo Node.js App
+# Google Cloud IoT Core Demo Node.js App
 A Node.js app targeting Raspberry Pi 3 running Raspbian that demonstrating how to provision an device into [Google Cloud IoT Core](https://cloud.google.com/iot-core/).  
 
 This project is the device half of the Cloud IoT Core demo. The provisioning mobile app can be found here [TODO: LINK TO ANDROID APP](TODO) 
