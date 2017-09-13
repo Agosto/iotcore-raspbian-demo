@@ -8,7 +8,7 @@ This project is the device half of the Cloud IoT Core demo. The provisioning mob
 - Raspberry Pi 3 Model B (other models might work but have not been tested)
 - MicroSD card of 16 GB or higher
 - Micro USB power adapter.
-- HDMI display for setup (setup only)
+- HDMI display and cable (setup only)
 - USB Mouse and keyboard (setup only)
 - (optional) [Blinkt!](https://shop.pimoroni.com/products/blinkt) RGB LED Strip
 
@@ -17,7 +17,7 @@ This project is the device half of the Cloud IoT Core demo. The provisioning mob
 ### 1) Flash Raspbian to Raspberry Pi 3.
 Official instructions can be found [HERE](https://www.raspberrypi.org/documentation/installation/installing-images/README.md): 
 
-Quick Setup
+#### Quick Setup
 - Download Raspbian Image from [https://www.raspberrypi.org/downloads/raspbian/](https://www.raspberrypi.org/downloads/raspbian/). _Note:_ Download the version with a desktop. 
 - Unzip and Flash image to SD Card. [Etcher](https://etcher.io/) is good open source SD card burner app
 - Insert SD card into your Raspberry Pi3 and connect the USB power adapter, mouse, keyboard and  HDMI display.  You should see the device boot to desktop.
@@ -54,6 +54,9 @@ $ git clone https://github.com/agosto-dev/iotcore-raspbian-demo
 ```
 
 - Or Download Zip: [IotCoreDemo](https://github.com/agosto-dev/iotcore-raspbian-demo/releases)
+ 
+Which ever way to get the app, make sure it's cloned or unzipped to pi's home dir (`/home/pi`) 
+
  
 #### Install App Dependencies
 
@@ -117,3 +120,19 @@ Under normal operation, you should see the following Indiciators.
 - Yellow (once on startup and every time a new config is published)
 - Green (every 1 min)
 
+### NPM Scripts
+
+**reset** - reset device by deleting keys and stored settings  
+```bash
+$ npm run reset
+```
+
+**start** - start app  
+```bash
+$ npm start
+```
+
+**new** - resets and starts app  
+```bash
+$ npm run new
+```
