@@ -136,6 +136,6 @@ $ npm start
 $ npm run new
 ```
 
-## Pushing configs in the GCP Console
+### Pushing configs in the GCP Console
 
 If you send an updated device config in the IoT Core section of the Cloud console (or via API), the device LEDs will flash yellow and the text from your config will be displayed (or logged).
