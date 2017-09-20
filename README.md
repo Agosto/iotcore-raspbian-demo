@@ -66,19 +66,19 @@ $ npm install
 
 #### Run App*
 
-App must be run as root/sudo to use BLE advertising (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).  See notes below how to remove this restriction.
-
-```bash
-sudo node main.js
-```
-
-*Running without root/sudo
+To use BLE advertising without root, run the following (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).
 
 ```bash
 $ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 ```
+This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising (only need to do this once).
 
-This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
+Run the App
+
+```bash
+node main.js
+```
+
 
 #### Configure App to Run on boot (via cron)
 
@@ -86,14 +86,14 @@ This is a very simple way to start the app on boot via cron.  You can also use [
 
 - Add this to user `pi` cron jobs
 ```bash
-$ chmod +x startup.sh
 $ crontab -e
 ```
 - Add the following job and save
 ```bash
-@reboot /home/pi/iotcore-raspbian-demo/startup.sh
+@reboot /home/pi/iotcore-raspbian-demo/startup.sh > /home/pi/iot.log 2&>1
 ```
 - Reboot!
+- Log in and check `/home/pi/iot.log` if you're having issues.
 
 ### Blinkt!
 Optionally you can attached a Blinkt! LED strip to your Raspberry Pi 3 and receive visual feedback.
@@ -136,3 +136,7 @@ $ npm start
 ```bash
 $ npm run new
 ```
+
+### Pushing configs in the GCP Console
+
+If you send an updated device config in the IoT Core section of the Cloud console (or via API), the device LEDs will flash yellow and the text from your config will be displayed (or logged).
