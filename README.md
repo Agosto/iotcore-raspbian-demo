@@ -71,13 +71,14 @@ To use BLE advertising without root, run the following (see [Bleno note]https://
 ```bash
 $ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 ```
+This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising (only need to do this once).
 
 Run the App
 
 ```bash
 node main.js
+```
 
-This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
 
 #### Configure App to Run on boot (via cron)
 
