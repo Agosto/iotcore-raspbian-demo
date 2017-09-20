@@ -86,7 +86,6 @@ This is a very simple way to start the app on boot via cron.  You can also use [
 
 - Add this to user `pi` cron jobs
 ```bash
-$ chmod +x startup.sh
 $ crontab -e
 ```
 - Add the following job and save
