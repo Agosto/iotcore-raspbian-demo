@@ -1,4 +1,3 @@
-
 const iotcore = require('./iotcore');
 const provisioning = require('./provisioning');
 const leds = require('./leds');
@@ -8,8 +7,8 @@ function main() {
   provisioning.provision()
     .then(settings=>{
       console.log(settings);
-      iotcore.connect(settings).then(client=>{
-        client.subscribe(`/devices/${settings.deviceId}/config`);
+      iotcore.connect(settings,provisioning.privateKeyFile).then(client=>{
+        client.subscribe(iotcore.configTopic(settings.deviceId));
         client.on('message', function (topic, message) {
           // message is Buffer
           console.log(message.toString());

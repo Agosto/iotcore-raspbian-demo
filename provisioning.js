@@ -1,9 +1,5 @@
-
-
 const eddystoneBeacon = require('eddystone-beacon');
-
 const fs = require('fs');
-//const keypair = require('keypair');
 const Promise = require('promise');
 const crypto = require("crypto");
 const os = require('os');
@@ -20,12 +16,25 @@ const spawn = require('child_process').spawn;
 
 const leds = require('./leds');
 
+/**
+ * start advertising eddystone url beacon
+ */
 function advertiseBeacon() {
   console.log('advertising beacon');
   const url = "http://"+getWifiIPAddress();
   eddystoneBeacon.advertiseUrl(url);
 }
 
+/**
+ * @typedef {Object} KeyPair
+ * @property {string} public public key
+ * @property {string} private private key
+ */
+
+/**
+ * Generates a new KeyPair
+ * @returns {Promise.<KeyPair>}
+ */
 function generateKeyPair() {
   console.log('Generating new key pair');
   return new Promise((resolve,reject)=>{
@@ -37,11 +46,19 @@ function generateKeyPair() {
   }).then(()=>getStoreKeyPair())
 }
 
+/**
+ * Gets device PairKey, generates new one if doesn't exist
+ * @returns {Promise.<KeyPair>}
+ */
 function getKeyPair() {
   return getStoreKeyPair()
     .catch(err=>generateKeyPair())
 }
 
+/**
+ * loads a KeyPair from the filesystem
+ * @returns {Promise.<KeyPair>}
+ */
 function getStoreKeyPair() {
   console.log(`Loading stored key pair at ${publicKeyFile}`);
   const pair  = {public:null,private:null};
@@ -56,6 +73,19 @@ function getStoreKeyPair() {
     });
 }
 
+/**
+ * @typedef {Object} DeviceSettings
+ * @property {string} deviceId local device id
+ * @property {string} projectId Google Cloud Iot Core project id
+ * @property {string} registryId registry id in project
+ * @property {string} encodedPublicKey public cert
+ */
+
+/**
+ * loads device settings from the filesystem or generates new ones if doesn't exist
+ * @param {KeyPair} pair
+ * @returns {Promise.<DeviceSettings>}
+ */
 function loadDeviceSettings(pair) {
   console.log(`Loading device settings at ${deviceSettingsFile}`);
   return readFile(deviceSettingsFile,'utf8')
@@ -70,6 +100,11 @@ function loadDeviceSettings(pair) {
     })
 }
 
+/**
+ * generate new device settings and save it to the filesystem
+ * @param {KeyPair} pair
+ * @returns {Promise.<DeviceSettings>}
+ */
 function generateDeviceSettings(pair) {
   console.log('Generating new device Id');
   const data = {deviceId:'device-'+crypto.randomBytes(4).toString('hex'),projectId:'',registryId:''};
@@ -80,6 +115,10 @@ function generateDeviceSettings(pair) {
     });
 }
 
+/**
+ * get the wifi ip address
+ * @returns {string}
+ */
 function getWifiIPAddress() {
   const interfaces = os.networkInterfaces();
   if(interfaces.wlan0) {
@@ -89,9 +128,23 @@ function getWifiIPAddress() {
       }
     }
   }
+  // mac hack
+  if(interfaces.en0) {
+    for (let a of interfaces.en0) {
+      if (a.family === 'IPv4') {
+        return a.address;
+      }
+    }
+  }
   throw 'no wifi address';
 }
 
+/**
+ * Starts web server for device configuration.
+ * Returns a promise that resolves when device's projectId and registryId are set.
+ * @param {DeviceSettings} settings
+ * @returns {Promise.<DeviceSettings>} DeviceSettings with a projectId and registryId set.
+ */
 function webServer(settings) {
   return new Promise((resolve,reject)=> {
     const hostname = getWifiIPAddress();
@@ -132,6 +185,10 @@ function webServer(settings) {
   });
 }
 
+/**
+ * Starts the provisioning process and returns a promise that resolves once the device is fully registered.
+ * @returns {Promise.<DeviceSettings>}
+ */
 function provision() {
   return getKeyPair()
     .then(pair=>loadDeviceSettings(pair))
@@ -143,5 +200,6 @@ function provision() {
 }
 
 module.exports = {
-  provision: provision
+  provision: provision,
+  privateKeyFile: privateKeyFile
 };

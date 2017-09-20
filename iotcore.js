@@ -2,13 +2,14 @@ const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const mqtt = require('mqtt');
 
-const privateKeyFile = __dirname + '/rsa_private.pem';
-const publicKeyFile = __dirname + '/rsa_cert.pem';
-const deviceSettingsFile = __dirname + '/device.json';
-
+/**
+ * Create a JWT to authenticate this device.
+ * @param {string} projectId
+ * @param {string} privateKeyFile
+ * @param {string} algorithm
+ * @returns {string}
+ */
 function createJwt (projectId, privateKeyFile, algorithm) {
-  // Create a JWT to authenticate this device. The device will be disconnected
-  // after the token expires, and will have to reconnect with a new token. The
   // audience field should always be set to the GCP project id.
   const token = {
     'iat': parseInt(Date.now() / 1000),
@@ -19,12 +20,31 @@ function createJwt (projectId, privateKeyFile, algorithm) {
   return jwt.sign(token, privateKey, { algorithm: algorithm });
 }
 
+/**
+ * gets topic for publishing telemetry data
+ * @param {string} deviceId
+ * @returns {string}
+ */
 function telemetryTopic(deviceId) {
   return `/devices/${deviceId}/events`;
 }
 
+/**
+ * gets topic for subscribing to config data
+ * @param {string} deviceId
+ * @returns {string}
+ */
+function configTopic(deviceId) {
+  return `/devices/${deviceId}/config`;
+}
 
-function connect(settings) {
+/**
+ * Connects to IoT Core MQTT bridge and returns a promise that resolves to a MQTT client once connected.
+ * @param {DeviceSettings} settings
+ * @param {String} privateKeyFile
+ * @returns {Promise.<MqttClient>}
+ */
+function connect(settings,privateKeyFile) {
 
   const cloudRegion = "us-central1";
   const mqttClientId = `projects/${settings.projectId}/locations/${cloudRegion}/registries/${settings.registryId}/devices/${settings.deviceId}`;
@@ -67,5 +87,6 @@ function connect(settings) {
 
 module.exports = {
   connect : connect,
-  telemetryTopic: telemetryTopic
+  telemetryTopic: telemetryTopic,
+  configTopic: configTopic
 };
