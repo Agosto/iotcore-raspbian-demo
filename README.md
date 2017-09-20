@@ -66,17 +66,16 @@ $ npm install
 
 #### Run App*
 
-App must be run as root/sudo to use BLE advertising (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).  See notes below how to remove this restriction.
-
-```bash
-sudo node main.js
-```
-
-*Running without root/sudo
+To use BLE advertising without root, run the following (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).
 
 ```bash
 $ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 ```
+
+Run the App
+
+```bash
+node main.js
 
 This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
 
@@ -136,3 +135,7 @@ $ npm start
 ```bash
 $ npm run new
 ```
+
+## Pushing configs in the GCP Console
+
+If you send an updated device config in the IoT Core section of the Cloud console (or via API), the device LEDs will flash yellow and the text from your config will be displayed (or logged).
