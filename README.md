@@ -108,7 +108,9 @@ Green - Device is publishing telemetry data to IOT Core
 
 Yellow - Device is receiving a config update from IOT Core.
 
-Under normal operation, you should see the following Indiciators.
+Purple - Device is receiving an HTTP `OPTIONS` request
+
+Under normal operation, you should see the following Indicators.
 
 **Unprovisioned Device**
 - Red 
