@@ -2,7 +2,12 @@ const iotcore = require('./lib/iotcore');
 const provisioning = require('./lib/provisioning');
 const leds = require('./lib/leds');
 
-
+/**
+ * connects to IoT Core MQTT bridge, subscribes to the config topic, and publishes to the telemetry topic 1/min.
+ * when token expires, recursively calls this function to reconnect and continue.
+ * @param {DeviceSettings} settings
+ * @returns {Promise.<null>}
+ */
 function startPublishing(settings) {
   console.log(settings);
   return iotcore.connect(settings,provisioning.privateKeyFile)
@@ -28,34 +33,24 @@ function startPublishing(settings) {
         clearInterval(timerId);
         client.end(true,()=>{
           console.log('token expired, reconnecting..');
-          startPublishing(settings);
+          // recursive callback
+          startPublishing(settings).catch(e=>console.warn(e));
         })
       });
       return Promise.resolve();
   });
 }
 
+/**
+ * main entry point
+ */
 function main() {
   leds.ledOn(255,0,0);
+  // wait for provisioning
   provisioning.provision()
+    // connect to IoT core
     .then(settings=>startPublishing(settings))
-    /*.then(settings=>{
-      console.log(settings);
-      iotcore.connect(settings,provisioning.privateKeyFile).then(client=>{
-        client.subscribe(iotcore.configTopic(settings.deviceId));
-        client.on('message', function (topic, message) {
-          // message is Buffer
-          console.log(message.toString());
-          leds.ledOn(255,255,0,5000);
-          //client.end()
-        });
-        const topic = iotcore.telemetryTopic(settings.deviceId);
-        setInterval(()=>{
-          client.publish(topic,`${settings.deviceId} ${new Date().toISOString()}`);
-          leds.ledOn(0,255,0,5000);
-        },(1000*60));
-      });
-    })*/
+    // unrecoverable error
     .catch(error=>{
       leds.ledOn(255,0,0);
       console.warn(error);
@@ -63,6 +58,3 @@ function main() {
 }
 
 main();
-
-
-// openssl req -x509 -newkey rsa:2048 -keyout rsa_private.pem -nodes -out rsa_cert.pem -subj "/CN=unused"
