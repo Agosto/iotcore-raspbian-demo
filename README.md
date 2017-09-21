@@ -162,7 +162,7 @@ If you send an updated device config in the IoT Core section of the Cloud consol
 
 - `POST` accept a json payload to set the `deviceId` and `registryId`
 - `OPTIONS` acts as normal but also lights the LED (if connected) purple.
-- **TODO**: `DELETE` deletes key pairs and device settings and reboots device   
+- `DELETE` deletes key pairs and device settings and reboots device   
     
 4. Once device has a `projectId` and `registryId` (either after a POST or present on startup), then device will:
 - Subscribe to the IoT Core device config topic
