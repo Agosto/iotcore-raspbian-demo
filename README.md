@@ -148,9 +148,9 @@ If you send an updated device config in the IoT Core section of the Cloud consol
 
 1. On start attempts to load key pairs and device settings from the filesystem.   If none exist, new ones are generated.
 2. Device advertises an eddystone url beacon of the ip address of it's webserver.
-3. Webserver can received GET, POST, DELETE, OPTION and http request.
+3. Webserver can received GET, POST, DELETE, OPTION http request.
 
--  `GET` returns device settings including it's deviceId and public cert.  i.e.
+-  `GET` returns device settings:
 ```json
 {
   "deviceId": "device-12345678",
