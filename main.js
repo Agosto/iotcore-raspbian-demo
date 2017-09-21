@@ -1,6 +1,6 @@
-const iotcore = require('./iotcore');
-const provisioning = require('./provisioning');
-const leds = require('./leds');
+const iotcore = require('./lib/iotcore');
+const provisioning = require('./lib/provisioning');
+const leds = require('./lib/leds');
 
 
 function startPublishing(settings) {
