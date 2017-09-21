@@ -1,7 +1,7 @@
 {
   "name": "itocorepie",
   "version": "0.0.1",
-  "description" : "Google Cloud IoT Core",
+  "description" : "Google Cloud IoT Core Demo Node.js App",
   "main": "main.js",
   "dependencies": {
     "blinkt": "git+https://github.com/agosto-chrisdavis/node-blinkt",

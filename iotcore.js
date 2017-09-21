@@ -70,7 +70,7 @@ function connect(settings,privateKeyFile) {
       resolve(client);
     });
 
-    client.on('close', (data) => {
+    /*client.on('close', (data) => {
       console.log('close', data);
     });
 
@@ -80,7 +80,7 @@ function connect(settings,privateKeyFile) {
 
     client.on('packetsend', (data) => {
       console.log('packetsend', data);
-    });
+    });*/
   });
 
 }
