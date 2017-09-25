@@ -6,7 +6,7 @@ This project is the device half of the Cloud IoT Core demo. The provisioning mob
 ## What You Need
 
 - Raspberry Pi 3 Model B (other models might work but have not been tested)
-- MicroSD card of 16 GB or higher
+- MicroSD card of 8 GB or higher
 - Micro USB power adapter.
 - HDMI display and cable (setup only)
 - USB Mouse and keyboard (setup only)
@@ -61,24 +61,24 @@ Which ever way to get the app, make sure it's cloned or unzipped to pi's home di
 #### Install App Dependencies
 
 ```bash
+$ cd iotcore-raspbian-demo
 $ npm install
 ```
-
-#### Run App*
+#### Enable BLE advertising without root
 
 To use BLE advertising without root, run the following (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).
 
 ```bash
 $ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
 ```
-This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising (only need to do this once).
+This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
 
-Run the App
+#### Run App
 
 ```bash
-node main.js
+./startup.sh
 ```
-
+*(You may get a `no such file or directory` error the first time - this is normal because the device.json file hasn't been created yet.)*
 
 #### Configure App to Run on boot (via cron)
 
@@ -148,7 +148,7 @@ If you send an updated device config in the IoT Core section of the Cloud consol
 
 1. On start attempts to load key pairs and device settings from the filesystem.   If none exist, new ones are generated.
 2. Device advertises an eddystone url beacon of the ip address of it's webserver.
-3. Webserver can received GET, POST, DELETE, OPTION http request.
+3. A Webserver running on the Pi on port 8080 can receive GET, POST, DELETE, OPTION http requests.  *(The file path after `http://x.x.x.x:8080` is ignored)*
 
 -  `GET` returns device settings:
 ```json
@@ -161,10 +161,34 @@ If you send an updated device config in the IoT Core section of the Cloud consol
 ```  
 
 - `POST` accept a json payload to set the `deviceId` and `registryId`
-- `OPTIONS` acts as normal but also lights the LED (if connected) purple.
+- `OPTIONS` acts as normal but also lights the LED (if connected) purple
 - `DELETE` deletes key pairs and device settings and reboots device   
     
 4. Once device has a `projectId` and `registryId` (either after a POST or present on startup), then device will:
 - Subscribe to the IoT Core device config topic
 - Publish data 1/min to the telemetry topic
 - reconnect when token expires
+
+### Integration with IoT Core and Android Test App
+
+An Android app is available that will use the simple API described above to provision your device with the IoT Core Registry.
+
+#### Setting up IoT Core
+
+1. Pick a GCP project you have Owner access and enable the IoT Core API
+2. Create a Device Registry
+3. Create or select a pub/sub topic (#2 will guide you through this)
+
+At this point, you should have an empty device registry.
+
+#### Use Android app to provision the Pi
+
+1. Your Android device should be on the same Wifi network as the Pi (or can access tcp port 8080 on the Pi)
+2. Make sure the IoT Core demo app is running on the Pi
+3. Download and install the Android provisioning app *TODO - link to Android app*
+4. Run the App, login and select the GCP project with your Device Registry
+5. The Device should show up in the list with a red icon - Tap on it to provision
+6. Device icon will turn green. If you have a Blinkt! strip, it should flash green.
+
+Check your IoT Core Registry - your device should be there!
+
