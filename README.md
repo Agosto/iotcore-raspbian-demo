@@ -90,7 +90,7 @@ $ crontab -e
 ```
 - Add the following job and save
 ```bash
-@reboot /home/pi/iotcore-raspbian-demo/startup.sh > /home/pi/iot.log 2&>1
+@reboot /home/pi/iotcore-raspbian-demo/startup.sh > /home/pi/iot.log 2>&1
 ```
 - Reboot!
 - Log in and check `/home/pi/iot.log` if you're having issues.
