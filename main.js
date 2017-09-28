@@ -15,8 +15,16 @@ function startPublishing(settings) {
       client.subscribe(iotcore.configTopic(settings.deviceId));
       // listen for config changes
       client.on('message', function (topic, message) {
-        console.log(message.toString());
-        leds.ledOn(255,255,0,5000);
+        try {
+          leds.ledOn(255,255,0,5000);
+          console.log(message.toString());
+          const configs = JSON.parse(message.toString());
+          if(configs) {
+            provisioning.enableConfigServer(configs.config_server_on,settings);
+          }
+        } catch(error) {
+          console.warn(error);
+        }
       });
 
       // publish data every min
