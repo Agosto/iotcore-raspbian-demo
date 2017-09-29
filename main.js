@@ -12,7 +12,7 @@ function startPublishing(settings) {
   console.log(settings);
   return iotcore.connect(settings,provisioning.privateKeyFile)
     .then(client=>{
-      client.subscribe(iotcore.configTopic(settings.deviceId));
+      client.subscribe(iotcore.configTopic(settings.deviceId),{qos: 1});
       // listen for config changes
       client.on('message', function (topic, message) {
         try {
