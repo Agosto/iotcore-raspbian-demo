@@ -190,7 +190,7 @@ At this point, you should have an empty device registry.
 5. If you have multiple device registries, you can choose one
 6. The Device should show up in the list with a red icon - Tap on it to Provision it
 7. Device icon will turn green. If you have a Blinkt! strip, it should flash
-8. Once the device is provision the web server built into the demo app on the Pi will shut down
+8. Once the device is provisioned, the web server built into the demo app on the Pi will shut down
 
 Check your IoT Core Registry - your device should be there!
 
