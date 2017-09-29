@@ -148,7 +148,7 @@ If you send an updated device config in the IoT Core section of the Cloud consol
 
 1. On start attempts to load key pairs and device settings from the filesystem.   If none exist, new ones are generated.
 2. Device advertises an eddystone url beacon of the ip address of it's webserver.
-3. A Webserver running on the Pi on port 8080 can receive GET, POST, DELETE, OPTION http requests.  *(The file path after `http://x.x.x.x:8080` is ignored)*
+3. A Webserver running on the Pi on port 8080 can receive GET, POST, DELETE, OPTION http requests.
 
 -  `GET` returns device settings:
 ```json
@@ -187,8 +187,13 @@ At this point, you should have an empty device registry.
 2. Make sure the IoT Core demo app is running on the Pi
 3. Download and install the Android provisioning app *TODO - link to Android app*
 4. Run the App, login and select the GCP project with your Device Registry
-5. The Device should show up in the list with a red icon - Tap on it to provision
-6. Device icon will turn green. If you have a Blinkt! strip, it should flash green.
+5. If you have multiple device registries, you can choose one
+6. The Device should show up in the list with a red icon - Tap on it to Provision it
+7. Device icon will turn green. If you have a Blinkt! strip, it should flash
+8. Once the device is provisioned, the web server built into the demo app on the Pi will shut down
 
 Check your IoT Core Registry - your device should be there!
+
+To turn the web server back on (for reprovisioning or to flash the LEDs), tap the device in the list and select Update Config.  If you *Enable Config Server*, a simple configuration: `{"config_server_on":true}` is sent to the device, which turns the web server back on.
+
 
