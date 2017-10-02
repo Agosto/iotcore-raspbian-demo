@@ -53,7 +53,7 @@ function publishUntilError(client,settings) {
       leds.ledOn(0, 255, 0, 5000);
     },PUBLISH_INTERVAL);
 
-    // error handle error
+    // error handler
     // likely an expired token or block communications
     client.once('error', (error) => {
       console.log('error', error);
