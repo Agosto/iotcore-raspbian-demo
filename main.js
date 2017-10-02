@@ -2,54 +2,70 @@ const iotcore = require('./lib/iotcore');
 const provisioning = require('./lib/provisioning');
 const leds = require('./lib/leds');
 
-const PUBLISH_INTERVAL = 1000*10;
+const PUBLISH_INTERVAL = 1000*60;
 
 /**
- * connects to IoT Core MQTT bridge, subscribes to the config topic, and publishes to the telemetry topic 1/min.
- * when token expires, recursively calls this function to reconnect and continue.
+ * connects to IoT Core MQTT bridge, subscribes to the config topic, and publishes to the telemetry topic 1/PUBLISH_INTERVAL.
+ * when token expires or connection is blocked, recursively calls itself to reconnect and continue.
  * @param {DeviceSettings} settings
  * @returns {Promise.<null>}
  */
 function startPublishing(settings) {
   console.log(settings);
   return connectWithRetry(settings)
-    .then(client=>{
-      client.subscribe(iotcore.configTopic(settings.deviceId),{qos: 1});
-      // listen for config changes
-      client.on('message', function (topic, message) {
-        try {
-          leds.ledOn(255,255,0,5000);
-          console.log(message.toString());
-          const configs = JSON.parse(message.toString());
-          if(configs) {
-            provisioning.enableConfigServer(configs.config_server_on,settings);
-          }
-        } catch(error) {
-          console.warn(error);
-        }
-      });
-
-      // publish data every min
-      const topic = iotcore.telemetryTopic(settings.deviceId);
-      //client.publish(topic, `${settings.deviceId} ${new Date().toISOString()}`);
-      const timerId = setInterval(()=>{
-        client.publish(topic, `${settings.deviceId} ${new Date().toISOString()}`);
-        leds.ledOn(0, 255, 0, 5000);
-      },PUBLISH_INTERVAL);
-
-      // error handler for expired token
-      client.once('error', (err) => {
-        console.log('error', err);
-        clearInterval(timerId);
-        client.end(true,()=>{
-          // likely an expired token or block communications
-          // restart publishing
-          startPublishing(settings).catch(error=>console.warn('unrecoverable',error));
-        })
-      });
-      return Promise.resolve();
+    .then(client=>publishUntilError(client,settings))
+    .catch(error=>{
+      // publishing stopped, restart
+      console.log('publishing stopped',error);
+      return startPublishing(settings);
     });
 }
+
+/**
+ * subscribes to the config topic and publishes to the telemetry topic 1/PUBLISH_INTERVAL.
+ * returns a Promise that will throw an error when connection expires or is blocked
+ * @param {MqttClient} client
+ * @param {DeviceSettings} settings
+ * @returns {Promise.<object>} throws an error when connection expires or is blocked
+ */
+function publishUntilError(client,settings) {
+  return new Promise((resolve,reject)=>{
+    client.subscribe(iotcore.configTopic(settings.deviceId),{qos: 1});
+    // listen for config changes
+    client.on('message', function (topic, message) {
+      try {
+        leds.ledOn(255,255,0,5000);
+        console.log(message.toString());
+        const configs = JSON.parse(message.toString());
+        if(configs) {
+          provisioning.enableConfigServer(configs.config_server_on,settings);
+        }
+      } catch(error) {
+        console.warn(error);
+      }
+    });
+
+    // publish data every min
+    const topic = iotcore.telemetryTopic(settings.deviceId);
+    //client.publish(topic, `${settings.deviceId} ${new Date().toISOString()}`);
+    const timerId = setInterval(()=>{
+      client.publish(topic, `${settings.deviceId} ${new Date().toISOString()}`);
+      leds.ledOn(0, 255, 0, 5000);
+    },PUBLISH_INTERVAL);
+
+    // error handle error
+    // likely an expired token or block communications
+    client.once('error', (error) => {
+      console.log('error', error);
+      clearInterval(timerId);
+      // end connection and reject
+      client.end(true,()=>{
+        reject(error)
+      })
+    });
+  });
+}
+
 
 /**
  * simple timeout wrapped in a promise
