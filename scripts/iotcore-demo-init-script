@@ -1,0 +1,57 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          iotcoredemo
+# Required-Start:    $network $local_fs $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: iotcore demo app
+# Description:       iotcore demo app
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="IoT Core Config Service"
+NAME=iotcoredemo
+PNAME=iotcoredemo
+DIR=/opt/iotcore-raspbian-demo/
+DAEMON=`which node`
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$PNAME
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.0-6) to ensure that this file is present.
+. /lib/lsb/init-functions
+
+do_start()
+{
+  start-stop-daemon --start --background --verbose --pidfile $PIDFILE -m --user pi --chuid pi --chdir $DIR --startas $DAEMON -- main.js
+  RETVAL="$?"
+  return "$RETVAL"
+}
+
+do_stop()
+{
+  start-stop-daemon --stop --pidfile $PIDFILE --remove-pidfile
+  RETVAL="$?"
+  return "$RETVAL"
+}
+
+case "$1" in
+  start)
+    log_daemon_msg "Starting $DESC " "$NAME"
+    echo
+    do_start
+  ;;
+  stop)
+    log_daemon_msg "Stopping $DESC " "$NAME"
+    echo
+    do_stop
+  ;;
+  *)
+    echo "Usage: $SCRIPTNAME {start|stop}" >&2
+    exit 3
+  ;;
+esac
