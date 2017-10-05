@@ -87,6 +87,9 @@ $ sudo ./install.sh
 ```bash
 sudo /etc/init.d/iotcoredemo start
 ```
+Debug logs are located in `/var/log/iotcoredemo`. 
+
+At this point you should be able to see the device in the Android test app. See below for more details.
 
 ### Blinkt!
 Optionally you can attached a Blinkt! LED strip to your Raspberry Pi 3 and receive visual feedback.
