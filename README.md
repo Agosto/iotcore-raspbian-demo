@@ -18,30 +18,47 @@ This project is the device half of the Cloud IoT Core demo. The provisioning mob
 Official instructions can be found [HERE](https://www.raspberrypi.org/documentation/installation/installing-images/README.md): 
 
 #### Quick Setup
-- Download Raspbian Image from [https://www.raspberrypi.org/downloads/raspbian/](https://www.raspberrypi.org/downloads/raspbian/). _Note:_ Download the version with a desktop. 
-- Unzip and Flash image to SD Card. [Etcher](https://etcher.io/) is good open source SD card burner app
-- Insert SD card into your Raspberry Pi3 and connect the USB power adapter, mouse, keyboard and  HDMI display.  You should see the device boot to desktop.
+- Download Raspbian Image from [https://www.raspberrypi.org/downloads/raspbian/](https://www.raspberrypi.org/downloads/raspbian/). _Note:_ Download the lite version if doing headless, otherwise grab the version with a desktop. 
+- Flash image to SD Card. [Etcher](https://etcher.io/) is good open source SD card burner app that can flash from zip file.
+- To get the device on your network you can do a headless configuration or setup with Keyboard / Mouse
+##### Headless
+Optionally, configure your Pi's network settings before moving the SD card for headless boot-up:
+- Pull SD card out and put back into your machine and you should be able to access the /boot/ directory.
+- If a wpa\_supplicant.conf file is placed into the /boot/ directory, this will be moved to the /etc/wpa\_supplicant/ directory the next time the system is booted, overwriting the network settings; this allows a Wifi configuration to be preloaded onto a card from a Windows or other machine that can only see the boot partition. Create the following wpa\_supplicant.conf file on the SD card:
+```bash
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+network={
+  ssid="YOUR_SSID"
+  psk="YOUR_PASSWORD"
+  key_mgmt=WPA-PSK
+}
+```
+- Place a file named `ssh` on the boot partition of the SD card. This will cause the Pi to start SSH on boot. The contents of the file are irrelevant
+- Insert SD card into your Pi
+- Connect power adapter
+- Once it boots, you'll have to figure out the DHCP-assigned IP address of your Pi. One option is to check your router's admin page, another possiblity is to run `arp -a | grep b8:27:eb` as long as your workstation is on the same physical network as the Pi. All Pi's have mac addresses that start out with b8:27:eb.
+
+##### With Keyboard / Mouse
+If not configuring for headless boot:
+- Insert SD card into your Pi, connect the USB power adapter, mouse, keyboard and HDMI display.  You should see the device boot to desktop.
 - (optional) Use the Raspberry Pi Configuration App (Desktop or CL) to set your timezone and keyboard.  _Note:_ On the desktop, `Raspberry Pi Configuration` can be found under the `Start -> Preferences` menu.
-- (optional) Change the default password (`"raspberry"`) for the `pi` user.
-- Configure Wi-Fi 
-- Update Raspbian
+- Configure Wi-Fi
+- (optional) Using Raspberry Pi Configuration App, set the device to run an SSH server on startup. Once this is done, you can disconnect the mouse, keyboard and display if you like. 
+
+##### Update Raspbian
+Login to your Pi, then upgrade it.
+
+(optional) Change the default password (`"raspberry"`) for the `pi` user.
 ```bash
 $ sudo apt update
 $ sudo apt full-upgrade
 ```
-- (optional) Using Raspberry Pi Configuration App, set the device to run an SSH server on startup. Once this is done, you can disconnect the mouse, keyboard and display if you like.  
 
 ### 2) Add software for app
-
-#### Install Node.js
+#### Install required packages, including bluetooth support
 ```bash
-$ curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-$ sudo apt-get install -y nodejs
-````
-#### Add Bluetooth support 
-
-```bash
-$ sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev
+$ sudo apt-get -y install git bluetooth bluez libbluetooth-dev libudev-dev
 ```
 
 #### Download Demo App
@@ -58,48 +75,23 @@ $ git clone https://github.com/agosto-dev/iotcore-raspbian-demo
 Which ever way to get the app, make sure it's cloned or unzipped to pi's home dir (`/home/pi`) 
 
  
-#### Install App Dependencies
+#### Install App
 
+This will install additional requirements and the app into /opt/
 ```bash
-$ cd iotcore-raspbian-demo
-$ npm install
+$ cd iotcore-raspbian-demo/scripts
+$ sudo ./install.sh
 ```
-#### Enable BLE advertising without root
-
-To use BLE advertising without root, run the following (see [Bleno note]https://github.com/sandeepmistry/bleno#running-without-rootsudo).
-
-```bash
-$ sudo setcap cap_net_raw+eip $(eval readlink -f `which node`)
-```
-This grants the `node` binary `cap_net_raw` privileges, so it can start/stop BLE advertising.
 
 #### Run App
-
 ```bash
-./startup.sh
+sudo /etc/init.d/iotcoredemo start
 ```
-*(You may get a `no such file or directory` error the first time - this is normal because the device.json file hasn't been created yet.)*
-
-#### Configure App to Run on boot (via cron)
-
-This is a very simple way to start the app on boot via cron.  You can also use [RC.LOCAL](https://www.raspberrypi.org/documentation/linux/usage/rc-local.md).  
-
-- Add this to user `pi` cron jobs
-```bash
-$ crontab -e
-```
-- Add the following job and save
-```bash
-@reboot /home/pi/iotcore-raspbian-demo/startup.sh > /home/pi/iot.log 2>&1
-```
-- Reboot!
-- Log in and check `/home/pi/iot.log` if you're having issues.
 
 ### Blinkt!
 Optionally you can attached a Blinkt! LED strip to your Raspberry Pi 3 and receive visual feedback.
 
 #### LED Indicators
-
 Red - Device is not ready to operate.  Should only flash for a brief sec on startup.  If persists longer, something is mis-configured (see setup).
 
 Blue - Device is ready for provisioning or operation. The LED will flash blue for 5 seconds.
@@ -123,7 +115,9 @@ Under normal operation, you should see the following Indicators.
 - Green (every 1 min)
 
 ### NPM Scripts
+You can start / stop or reset device keys using npm if needed. (Note you can also reset the device keys using the Android Test App)
 
+Change to the install directory (/opt/iotcore-raspbian-demo) before performing commands.
 **reset** - reset device by deleting keys and stored settings  
 ```bash
 $ npm run reset
