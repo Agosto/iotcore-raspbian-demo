@@ -52,7 +52,7 @@ Login to your Pi, then upgrade it.
 (optional) Change the default password (`"raspberry"`) for the `pi` user.
 ```bash
 $ sudo apt update
-$ sudo apt full-upgrade
+$ sudo apt -y full-upgrade
 ```
 
 ### 2) Add software for app
