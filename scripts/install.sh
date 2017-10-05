@@ -3,7 +3,7 @@
 # Simple script to install IoT Core demo app
 
 if [ $UID -ne 0 ]; then
-	echo "Error - run this installer as root"
+	echo "Please run this installer as root."
 	exit 1
 fi
 
@@ -28,4 +28,9 @@ sudo cp -prdf $DIR/.. /opt/iotcore-raspbian-demo
 sudo cp -f scripts/iotcore-demo-init-script /etc/init.d/iotcoredemo
 sudo update-rc.d iotcoredemo defaults
 
-echo "Install complete. Start app with: /etc/init.d/iotcoredemo start"
+# Put logrotate in place
+sudo mkdir -p /var/log/iotcoredemo
+sudo chown pi.pi /var/log/iotcoredemo
+sudo cp -f scripts/iotcore-demo-logrotate /etc/logrotate.d/iotcoredemo
+
+echo "Install complete.  Start app with: sudo /etc/init.d/iotcoredemo start"

@@ -1,0 +1,8 @@
+/var/log/iotcoredemo/iot.log {
+  rotate 6
+  weekly
+  compress
+  missingok
+  notifempty
+  copytruncate
+}
