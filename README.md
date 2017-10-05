@@ -87,7 +87,7 @@ $ sudo ./install.sh
 ```bash
 sudo /etc/init.d/iotcoredemo start
 ```
-Debug logs are located in `/var/log/iotcoredemo`. 
+Debug logs are located in the `/var/log/iotcoredemo/` directory. 
 
 At this point you should be able to see the device in the Android test app. See below for more details.
 
@@ -118,7 +118,7 @@ Under normal operation, you should see the following Indicators.
 - Green (every 1 min)
 
 ### NPM Scripts
-You can start / stop or reset device keys using npm if needed. (Note you can also reset the device keys using the Android Test App)
+You can start / stop or reset device keys using npm if needed. (Note you can also reset the device keys using the Android Test app so you will most likely not need to do this)
 
 Change to the install directory (/opt/iotcore-raspbian-demo) before performing commands.
 **reset** - reset device by deleting keys and stored settings  
