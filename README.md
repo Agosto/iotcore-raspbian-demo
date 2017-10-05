@@ -23,7 +23,7 @@ Official instructions can be found [HERE](https://www.raspberrypi.org/documentat
 - To get the device on your network you can do a headless configuration or setup with Keyboard / Mouse
 ##### Headless
 Optionally, configure your Pi's network settings before moving the SD card for headless boot-up:
-- Pull SD card out and put back into your machine and you should be able to access the /boot/ directory.
+- After flashing the card, pull SD card out and put back into your machine and you should be able to access the /boot/ directory.
 - If a wpa\_supplicant.conf file is placed into the /boot/ directory, this will be moved to the /etc/wpa\_supplicant/ directory the next time the system is booted, overwriting the network settings; this allows a Wifi configuration to be preloaded onto a card from a Windows or other machine that can only see the boot partition. Create the following wpa\_supplicant.conf file on the SD card:
 ```bash
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
